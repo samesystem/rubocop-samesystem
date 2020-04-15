@@ -39,22 +39,27 @@ module RuboCop
       #   good_foo_method(args)
       #
       class CommentFormat < Cop
-        # TODO: Implement the cop in here.
-        #
-        # In many cases, you can use a node matcher for matching node pattern.
-        # See https://github.com/rubocop-hq/rubocop/blob/master/lib/rubocop/node_pattern.rb
-        #
-        # For example
-        MSG = 'Use `#good_method` instead of `#bad_method`.'
+        include RangeHelp
 
-        def_node_matcher :bad_method?, <<~PATTERN
-          (send nil? :bad_method ...)
-        PATTERN
+        MSG = 'Comments should begin with space, then capital letter or non-word character and end with period.'
 
-        def on_send(node)
-          return unless bad_method?(node)
+        def investigate(processed_source)
+          processed_source.each_comment do |comment|
+            next if comment.text.start_with?(/# [A-Z\d\W_]/) && comment.text.end_with?('.')
+            next if comment.text.start_with?('# rubocop')
+            next if comment.text.start_with?('# frozen_string_literal')
+            add_offense(comment, location: location(comment))
+          end
+        end
 
-          add_offense(node)
+        private
+
+        def location(comment)
+          expression = comment.loc.expression
+          range_between(
+            expression.begin_pos,
+            expression.end_pos
+          )
         end
       end
     end

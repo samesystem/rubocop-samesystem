@@ -6,3 +6,7 @@ gemspec
 gem 'rake', '~> 12.0'
 gem 'rspec', '~> 3.0'
 gem 'parser', '~> 2.7'
+# group :development, :test do
+  gem 'pry'
+  gem 'pry-byebug'
+# end

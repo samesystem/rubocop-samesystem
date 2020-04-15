@@ -1,6 +1,4 @@
-# Write it!
-
 Samesystem/CommentFormat:
-  Description: 'TODO: Write a description of the cop.'
-  Enabled: pending
+  Description: 'Samesystem comment format cop.'
+  Enabled: true
   VersionAdded: '0.82'
