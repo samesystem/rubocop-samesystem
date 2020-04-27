@@ -10,7 +10,7 @@ RSpec.describe RuboCop::Cop::Samesystem::CommentFormat do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           # test
-          ^^^^^^ Comments should begin with space, then capital letter or non-word character and end with period.
+          ^^^^^^ Wrong comment format. Please use this: "# Capital letter, period sign."
         RUBY
       end
     end
@@ -19,7 +19,7 @@ RSpec.describe RuboCop::Cop::Samesystem::CommentFormat do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           # Test
-          ^^^^^^ Comments should begin with space, then capital letter or non-word character and end with period.
+          ^^^^^^ Wrong comment format. Please use this: "# Capital letter, period sign."
         RUBY
       end
     end
@@ -28,7 +28,18 @@ RSpec.describe RuboCop::Cop::Samesystem::CommentFormat do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           #Test.
-          ^^^^^^ Comments should begin with space, then capital letter or non-word character and end with period.
+          ^^^^^^ Wrong comment format. Please use this: "# Capital letter, period sign."
+        RUBY
+      end
+    end
+
+    context 'when multiple multi and single line comments' do
+      it 'registers an offense for single comment before multiline' do
+        expect_offense(<<~RUBY)
+          a = 1 # Not multiline
+                ^^^^^^^^^^^^^^^ Wrong comment format. Please use this: "# Capital letter, period sign."
+          # First line of ML comment
+          # second line of ML comment.
         RUBY
       end
     end
@@ -67,6 +78,20 @@ RSpec.describe RuboCop::Cop::Samesystem::CommentFormat do
       end
     end
 
+    context 'when multiline comment' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          # Another comment
+          # which has multiple lines.
+
+          a = 1 # Not multiline.
+          # First line of ML
+          # middle
+          # second line of ML.
+        RUBY
+      end
+    end
+
     context 'when rubocop comments' do
       it 'does not register an offense if comment starts with rubocop' do
         expect_no_offenses(<<~RUBY)
@@ -77,6 +102,18 @@ RSpec.describe RuboCop::Cop::Samesystem::CommentFormat do
       it 'does not register an offense if frozen_string_literal comment' do
         expect_no_offenses(<<~RUBY)
           # frozen_string_literal
+        RUBY
+      end
+    end
+
+    context 'when ends with other proper punctuation' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          # Propper comment!
+          a = 1
+          # Propper comment?
+          b = 2
+          # Propper comment;
         RUBY
       end
     end
