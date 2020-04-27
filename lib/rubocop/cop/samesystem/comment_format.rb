@@ -42,17 +42,68 @@ module RuboCop
         include RangeHelp
 
         MSG = 'Comments should begin with space, then capital letter or non-word character and end with period.'
+        COMMENT_TYPE = :tCOMMENT
 
         def investigate(processed_source)
-          processed_source.each_comment do |comment|
-            next if comment.text.start_with?(/# [A-Z\d\W_]/) && comment.text.end_with?('.')
-            next if comment.text.start_with?('# rubocop')
-            next if comment.text.start_with?('# frozen_string_literal')
-            add_offense(comment, location: location(comment))
-          end
+          process_comments(processed_source.tokens)
         end
 
         private
+
+        def process_comments(tokens)
+          return if tokens.empty?
+
+          multiline = 0
+          tokens.each_with_index do |token, index|
+            if token.type == COMMENT_TYPE
+              if multiline == 0
+                multiline = 1
+                if tokens[index + 1]&.type == COMMENT_TYPE
+                  if !special_comment?(token.text) && invalid_start?(token.text)
+                    add_offense(token, location: token.pos)
+                  end
+                else
+                  if invalid_comment?(token.text)
+                    add_offense(token, location: token.pos)
+                  end
+                end
+              else
+                if tokens[index + 1]&.type != COMMENT_TYPE
+                  if !special_comment?(token.text) && invalid_end?(token.text)
+                    add_offense(token, location: token.pos)
+                  end
+                  multiline = 0
+                end
+              end
+            end
+          end
+        end
+
+        def invalid_comment?(text)
+          return false if special_comment?(text)
+          return false unless invalid_start?(text) || invalid_end?(text)
+
+          true
+        end
+
+        def invalid_start?(text)
+          return false if text.start_with?(/# [A-Z\d\W_]/)
+
+          true
+        end
+
+        def invalid_end?(text)
+          return false if text.end_with?('.')
+
+          true
+        end
+
+        def special_comment?(text)
+          return true if text.start_with?('# rubocop')
+          return true if text.start_with?('# frozen_string_literal')
+
+          false
+        end
 
         def location(comment)
           expression = comment.loc.expression
