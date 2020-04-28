@@ -117,14 +117,6 @@ module RuboCop
 
           false
         end
-
-        def location(comment)
-          expression = comment.loc.expression
-          range_between(
-            expression.begin_pos,
-            expression.end_pos
-          )
-        end
       end
     end
   end
