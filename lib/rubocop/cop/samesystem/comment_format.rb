@@ -59,36 +59,43 @@ module RuboCop
         COMMENT_TYPE = :tCOMMENT
 
         def investigate(processed_source)
-          process_comments(processed_source.tokens)
+          return if processed_source.tokens.empty?
+
+          tokens = processed_source.tokens
+          multiline = false
+          tokens.each_with_index do |token, index|
+            next unless token.type == COMMENT_TYPE
+
+            multiline = if multiline == false
+              investigate_single_comment(token, tokens[index + 1])
+            else
+              investigate_multiline_comment(token, tokens[index + 1])
+            end
+          end
         end
 
         private
 
-        def process_comments(tokens)
-          return if tokens.empty?
-          multiline = 0
-          tokens.each_with_index do |token, index|
-            if token.type == COMMENT_TYPE
-              if multiline == 0
-                if tokens[index + 1]&.type == COMMENT_TYPE && (token.space_before?.nil? || token.space_before?.to_s == "\n")
-                  if !special_comment?(token.text) && invalid_start?(token.text)
-                    add_offense(token, location: token.pos)
-                  end
-                  multiline = 1
-                else
-                  if invalid_comment?(token.text)
-                    add_offense(token, location: token.pos)
-                  end
-                end
-              else
-                if tokens[index + 1]&.type != COMMENT_TYPE
-                  if !special_comment?(token.text) && invalid_end?(token.text)
-                    add_offense(token, location: token.pos)
-                  end
-                  multiline = 0
-                end
-              end
+        def investigate_single_comment(current_token, next_token)
+          if beginning_of_multiline_comment?(current_token, next_token)
+            if !special_comment?(current_token.text) && invalid_start?(current_token.text)
+              add_offense(current_token, location: current_token.pos)
             end
+            return true
+          else
+            if invalid_comment?(current_token.text)
+              add_offense(current_token, location: current_token.pos)
+            end
+            return false
+          end
+        end
+
+        def investigate_multiline_comment(current_token, next_token)
+          if end_of_multiline_comment?(next_token)
+            if !special_comment?(current_token.text) && invalid_end?(current_token.text)
+              add_offense(current_token, location: current_token.pos)
+            end
+            multiline = false
           end
         end
 
@@ -116,6 +123,27 @@ module RuboCop
           return true if text.start_with?('# frozen_string_literal')
 
           false
+        end
+
+        def beginning_of_multiline_comment?(current_token, next_token)
+          next_token&.type == COMMENT_TYPE && whole_line_comment?(current_token)
+        end
+
+        def end_of_multiline_comment?(next_token)
+          next_token&.type != COMMENT_TYPE
+        end
+
+        def whole_line_comment?(current_token)
+          # Checks if comment starts at the new line and is not located at the
+          # end of code line, like:
+          #
+          # # Whole line comment.
+          #
+          # and not:
+          #
+          # something = 'text' # End of code line comment.
+
+          current_token.space_before?.nil? || current_token.space_before?.to_s == "\n"
         end
       end
     end
