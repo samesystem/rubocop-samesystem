@@ -6,4 +6,6 @@ Samesystem/CommentFormat:
 Samesystem/NamingMatters:
   Description: 'Samesystem cop that catches some bad variable naming (i.e. "it").'
   Enabled: true
+  EnforcedStyle: naming_matters
+  SupportedStyles: ['naming_matters']
   VersionAdded: '1.0.0'
