@@ -2,3 +2,8 @@ Samesystem/CommentFormat:
   Description: 'Samesystem comment format cop.'
   Enabled: true
   VersionAdded: '0.82'
+
+Samesystem/NamingMatters:
+  Description: 'Samesystem cop that catches some bad variable naming (i.e. "it").'
+  Enabled: true
+  VersionAdded: '1.0.0'

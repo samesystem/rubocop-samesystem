@@ -1,4 +1,5 @@
-require "rubocop/samesystem/version"
+require 'yaml'
+require 'rubocop/samesystem/version'
 
 module RuboCop
   module Samesystem
