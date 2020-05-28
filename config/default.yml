@@ -3,9 +3,9 @@ Samesystem/CommentFormat:
   Enabled: true
   VersionAdded: '0.82'
 
-Samesystem/NamingMatters:
+Samesystem/VariableNaming:
   Description: 'Samesystem cop that catches some bad variable naming (i.e. "it").'
   Enabled: true
-  EnforcedStyle: naming_matters
-  SupportedStyles: ['naming_matters']
+  EnforcedStyle: it
+  SupportedStyles: ['it']
   VersionAdded: '1.0.0'

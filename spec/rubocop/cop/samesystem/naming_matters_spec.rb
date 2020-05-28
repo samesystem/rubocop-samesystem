@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-RSpec.describe RuboCop::Cop::Samesystem::NamingMatters, :config do
+RSpec.describe RuboCop::Cop::Samesystem::VariableNaming, :config do
   subject(:cop) { described_class.new(config) }
 
   let(:config) { RuboCop::Config.new(cop_config) }
   let(:cop_config) do
     {
-      'Samesystem/NamingMatters' => {
-        'EnforcedStyle' => 'naming_matters',
-        'SupportedStyles' => ['naming_matters']
+      'Samesystem/VariableNaming' => {
+        'EnforcedStyle' => 'it',
+        'SupportedStyles' => ['it']
       }
     }
   end
