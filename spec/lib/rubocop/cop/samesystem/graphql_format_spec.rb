@@ -70,7 +70,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
         class User
           graphql do |c|
             c.attribute :first_name, type: 'String!'
-            ^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
           end
         end
       RUBY

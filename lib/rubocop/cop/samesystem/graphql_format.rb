@@ -66,13 +66,17 @@ module RuboCop
         end
 
         def validate_graphql_attribute(attribute_node)
-          binding.pry
+          return true if attribute_node.children.count < 4
+
+          second_argument = attribute_node.children[3]
+          return true unless second_argument.hash_type?
+
+          add_offense(attribute_node, message: "`#{EXPECTED_ARGUMENT_NAME}.attribute` must be defined using chainable syntax such as `#{EXPECTED_ARGUMENT_NAME}.attribute(:name).type('String')`")
+          false
         end
 
         def graphql_attribute?(inner_node)
-          binding.pry
           return false unless inner_node.send_type?
-
           return false unless graphql_config_variable?(inner_node)
 
           inner_node.method_name == :attribute
