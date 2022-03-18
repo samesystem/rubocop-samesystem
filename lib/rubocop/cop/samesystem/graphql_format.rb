@@ -30,7 +30,6 @@ module RuboCop
         MSG = 'Use descriptive block parameter name or use numbered parameter "_1" instead.'.freeze
 
         def on_block(node)
-          require 'pry'; binding.pry
           return unless graphql_block?(node)
 
           return unless validate_graphql_arguments_count(node)
@@ -44,31 +43,37 @@ module RuboCop
         def validate_graphql_arguments_count(node)
           return true if node.arguments.count == 1
 
-          add_offence(node, location: node.location, message: 'GraphQL block should have single argument')
+          add_offense(node, message: '`graphql` block should have single argument')
           false
         end
 
         def validate_graphql_argument_name(node)
-          argument_name = node.arguments.map(&:name).first
+          argument = node.arguments.first
+          return true unless argument
+
+          argument_name = argument.children.first
           return true if !argument_name || argument_name == EXPECTED_ARGUMENT_NAME
 
-          add_offence(node, location: node.location, message: "GraphQL block should have argument named #{EXPECTED_ARGUMENT_NAME.to_s.inspect}")
+          add_offense(argument, message: "`graphql` block should have argument named `#{EXPECTED_ARGUMENT_NAME}`")
           false
         end
 
         def validate_graphql_attributes(node)
-          attribute_nodes = node.body.children.select(&:send_type?).select { graphql_attribute?(_1) }
+          attribute_nodes = node.children[2..].select { graphql_attribute?(_1) }
           attribute_nodes.each do |attribute_node|
             validate_graphql_attribute(attribute_node)
           end
         end
 
         def validate_graphql_attribute(attribute_node)
+          binding.pry
         end
 
         def graphql_attribute?(inner_node)
-          require 'pry'; binding.pry
-          return unless graphql_config_variable?(inner_node)
+          binding.pry
+          return false unless inner_node.send_type?
+
+          return false unless graphql_config_variable?(inner_node)
 
           inner_node.method_name == :attribute
         end

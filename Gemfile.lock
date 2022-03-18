@@ -53,6 +53,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  byebug
   parser (~> 2.7)
   pry
   pry-byebug
