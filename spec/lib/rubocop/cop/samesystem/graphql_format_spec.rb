@@ -77,6 +77,49 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
     end
   end
 
+  context 'when type is defined as non-string' do
+    it 'registers an offense' do
+      expect_offense(<<~RUBY)
+        class User
+          graphql do |c|
+            c.attribute(:first_name).type(:String!)
+                                          ^^^^^^^^ `.type` argument must be a string such as `.type('User')`
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'when type argument is not valid and there are other methods used' do
+    it 'registers an offense' do
+      expect_offense(<<~RUBY)
+        class User
+          graphql do |c|
+            c.attribute(:friends_count)
+             .required
+             .type(:Integer)
+                   ^^^^^^^^ `.type` argument must be a string such as `.type('User')`
+             .property(:friends_number)
+
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'when shortcut types are used' do
+    it 'registers an offense' do
+      expect_offense(<<~RUBY)
+        class User
+          graphql do |c|
+            c.attribute(:admin).type('[bool!]!')
+                                     ^^^^^^^^^^ Use "[Boolean!]!" instead
+          end
+        end
+      RUBY
+    end
+  end
+
   context 'when graphql block has attributes with chainable syntax' do
     it 'registers an offense' do
       expect_no_offenses(<<~RUBY)
