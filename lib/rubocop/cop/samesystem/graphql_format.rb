@@ -52,13 +52,13 @@ module RuboCop
           'text' => 'String',
         }
 
-        def on_block(node)
-          return unless graphql_block?(node)
+        def on_block(block_node)
+          return unless graphql_block?(block_node)
 
-          return unless validate_graphql_arguments_count(node)
-          return unless validate_graphql_argument_name(node)
+          return unless validate_graphql_arguments_count(block_node)
+          return unless validate_graphql_argument_name(block_node)
 
-          validate_graphql_attributes(node)
+          validate_graphql_attributes(block_node)
         end
 
         private
@@ -81,8 +81,9 @@ module RuboCop
           false
         end
 
-        def validate_graphql_attributes(node)
-          attribute_nodes = node.children[2..].select { graphql_attribute?(_1) }
+        def validate_graphql_attributes(block_node)
+          send_nodes = block_node.body.send_type? ? [block_node.body] : block_node.body.children
+          attribute_nodes = send_nodes.select { graphql_attribute?(_1) }
           attribute_nodes.each do |attribute_node|
             validate_graphql_attribute(attribute_node) && validate_attribute_type(attribute_node)
           end
@@ -111,11 +112,17 @@ module RuboCop
         def nested_method_node(outer_node, method_name)
           method_node = outer_node
 
-          while method_node && method_node.send_type? && method_node.method_name != :type
+          while method_node && !method_node?(method_node, method_name)
             method_node = method_node.receiver
           end
 
+          return nil unless method_node?(method_node, method_name)
+
           method_node
+        end
+
+        def method_node?(node, method_name)
+          node&.send_type? && node.method_name == method_name
         end
 
         def validate_type_arg_type(type_arg_node)
@@ -147,8 +154,9 @@ module RuboCop
 
         def graphql_config_variable(inner_node)
           config_variable = inner_node.receiver
-          config_variable = config_variable.receiver while config_variable.send_type?
+          config_variable = config_variable.receiver while config_variable && config_variable.send_type?
 
+          return nil unless config_variable
           return nil unless config_variable.lvar_type?
           return nil if config_variable.node_parts != [EXPECTED_ARGUMENT_NAME]
 
@@ -162,8 +170,8 @@ module RuboCop
           receiver.lvar_type? && receiver.node_parts == [EXPECTED_ARGUMENT_NAME]
         end
 
-        def graphql_block?(node)
-          node.send_node.method_name == :graphql
+        def graphql_block?(block_node)
+          block_node.method_name == :graphql
         end
       end
     end

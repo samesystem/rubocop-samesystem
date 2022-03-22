@@ -64,16 +64,32 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
     end
   end
 
-  context 'when graphql block has attributes with hash-style (non-chainable) syntax' do
-    it 'registers an offense' do
-      expect_offense(<<~RUBY)
-        class User
-          graphql do |c|
-            c.attribute :first_name, type: 'String!'
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
+  context 'when attribute with hash-style (non-chainable) syntax' do
+    context 'when graphql block has multiple attribute calls' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          class User
+            graphql do |c|
+              c.attribute :id, type: 'String'
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
+              c.attribute(:name)
+            end
           end
-        end
-      RUBY
+        RUBY
+      end
+    end
+
+    context 'when graphql block has single attribute' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          class User
+            graphql do |c|
+              c.attribute :first_name, type: 'String!'
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
+            end
+          end
+        RUBY
+      end
     end
   end
 
@@ -106,6 +122,21 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
       RUBY
     end
   end
+
+  context 'when type argument is not valid and there are other arguments' do
+    it 'registers an offense' do
+      expect_offense(<<~RUBY)
+        class User
+          graphql do |c|
+            c.attribute(:first_name).type('String')
+            c.attribute(:friends_count).type(:Integer)
+                                             ^^^^^^^^ `.type` argument must be a string such as `.type('User')`
+          end
+        end
+      RUBY
+    end
+  end
+
 
   context 'when shortcut types are used' do
     it 'registers an offense' do
