@@ -3,21 +3,18 @@
 module RuboCop
   module Cop
     module Samesystem
-      # @example EnforcedStyle: bar (default)
+      # @example GraphqlFormat: bar (default)
+      #
       #   # Description of the `bar` style.
-      #
       #   # bad
-      #   [1, 2, 3].each { |it| puts it }
-      #
-      #   # bad
-      #   it = fetch_calendar_lines(user)
+      #   graphql do |g|
+      #     g.attribute :foo, type: :string
+      #   end
       #
       #   # good
-      #   [1, 2, 3].each { |number| puts number }
-      #
-      #   # good
-      #   user_calendar_lines = fetch_calendar_lines(user)
-      #
+      #   graphql do |c|
+      #     c.attribute(:foo).type('String')
+      #   end
       class GraphqlFormat < Cop
         include ConfigurableFormatting
 
