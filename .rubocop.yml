@@ -1,3 +1,10 @@
 Naming/FileName:
  Exclude:
    - lib/rubocop-samesystem.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+Metrics/LineLength:
+  Max: 120
