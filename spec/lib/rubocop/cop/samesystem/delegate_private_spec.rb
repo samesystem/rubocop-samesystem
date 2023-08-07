@@ -3,10 +3,7 @@
 RSpec.describe RuboCop::Cop::Samesystem::DelegatePrivate do
   subject(:cop) { described_class.new(config) }
 
-  let(:config) { RuboCop::Config.new(cop_config) }
-  let(:cop_config) do
-    {}
-  end
+  let(:config) { RuboCop::Config.new({}) }
 
   context 'when no delegate is provided' do
     it 'registers no offense' do
@@ -73,6 +70,22 @@ RSpec.describe RuboCop::Cop::Samesystem::DelegatePrivate do
           end
 
           delegate :name, to: :user
+        end
+      RUBY
+    end
+  end
+
+  context 'when inner class is put in private scope and has delegate in public scope without "private: true"' do
+    it 'does not register an offense' do
+      expect_no_offenses(<<~RUBY)
+        class User
+          private
+
+          class InnerUser
+            delegate :name, to: :user
+          end
+
+          delegate :foo, to: :bar, private: true
         end
       RUBY
     end
