@@ -3,41 +3,36 @@
 module RuboCop
   module Cop
     module Samesystem
-      # @example DelegatePrivate
+      # Looks for `delegate` in private section without `private: true` option.
+      #
+      # @example
       #   # bad
-      #   class Foo
-      #     def bar=Bar.new
-      #
-      #     private
-      #
-      #     delegate :baz, to: :bar
-      #   end
+      #   private
+      #   delegate :baz, to: :bar
       #
       #   # bad
-      #   class Foo
-      #     delegate :baz, to: :bar, private: true
-      #
-      #     def bar=Bar.new
-      #   end
+      #   delegate :baz, to: :bar, private: true
       #
       #   # good
-      #   class Foo
-      #     def bar=Bar.new
-      #
-      #     private
-      #
-      #     delegate :baz, to: :bar, private: true
-      #   end
+      #   private
+      #   delegate :baz, to: :bar, private: true
       class DelegatePrivate < Cop
+        MSG_MISSING_PRIVATE = '`delegate` in private section should have `private: true` option'
+        MSG_WRONG_PRIVATE = 'private `delegate` should be put in private section'
+
         def on_send(node)
           mark_scope(node)
           return unless delegate_node?(node)
 
           if private_scope?(node) && !private_delegate?(node)
-            add_offense(node, message: '`delegate` in private section should have `private: true` option')
+            add_offense(node, message: MSG_MISSING_PRIVATE)
           elsif public_scope?(node) && private_delegate?(node)
-            add_offense(node, message: 'private `delegate` should be put in private section')
+            add_offense(node, message: MSG_WRONG_PRIVATE)
           end
+        end
+
+        def on_class(node)
+          cut_from_private_range(node.location.first_line..node.location.last_line)
         end
 
         private
@@ -53,22 +48,22 @@ module RuboCop
         end
 
         def mark_scope(node)
-          receiver_node, method_name, arg_node = *node
-          return if receiver_node || arg_node
+          return if node.receiver || !node.arguments.empty?
 
           @private_ranges ||= []
 
-          if method_name == :private
-            add_private_range(node)
-          elsif method_name == :public
-            cut_private_range_from(node.location.first_line)
+          scope_range = node.parent.location.first_line..node.parent.location.last_line
+          if node.method?(:private)
+            add_to_private_range(scope_range)
+          elsif node.method?(:public)
+            cut_from_private_range(scope_range)
           end
         end
 
         def delegate_node?(node)
           return false if node.receiver
 
-          node.method_name == :delegate
+          node.method?(:delegate)
         end
 
         def private_scope?(node)
@@ -79,18 +74,23 @@ module RuboCop
           !private_scope?(node)
         end
 
-        def add_private_range(node)
+        def add_to_private_range(scope_range)
           @private_ranges ||= []
-          @private_ranges += [node.location.first_line..node.parent.last_line]
+          @private_ranges += [scope_range]
         end
 
-        def cut_private_range_from(from_line)
+        def cut_from_private_range(scope_range)
           @private_ranges ||= []
-          @private_ranges = @private_ranges.each.with_object([]) do |range, new_ranges|
-            next if range.begin > from_line
 
-            new_range = range.include?(from_line) ? (range.begin...from_line) : range
-            new_ranges << new_range
+          @private_ranges = @private_ranges.each.with_object([]) do |private_range, new_ranges|
+            next if scope_range.cover?(private_range)
+
+            if private_range.cover?(scope_range)
+              new_ranges << (private_range.begin...scope_range.begin)
+              new_ranges << ((scope_range.end + 1)..private_range.end)
+            else
+              new_ranges << private_range
+            end
           end
         end
       end
