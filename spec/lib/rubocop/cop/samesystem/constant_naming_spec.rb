@@ -7,13 +7,17 @@ RSpec.describe RuboCop::Cop::Samesystem::ConstantNaming do
   let(:cop_config) do
     {
       'Samesystem/ConstantNaming' => {
-        'PreferredNames' => preferred_names
+        'UndesirableNames' => undesirable_names_config
       }
     }
   end
 
-  let(:preferred_names) do
-    { 'BAD_NAME' => 'GOOD_NAME' }
+  let(:undesirable_names_config) do
+    {
+      'BAD_NAME' => {
+        'Message' => 'Use GOOD_NAME instead of BAD_NAME'
+      }
+    }
   end
 
   describe 'bad constant name' do
@@ -45,8 +49,12 @@ RSpec.describe RuboCop::Cop::Samesystem::ConstantNaming do
     end
 
     context 'when multiple bad constants are used' do
-      let(:preferred_names) do
-        { 'BAD_NAME' => 'GOOD_NAME', 'OTHER_BAD_CONSTANT' => 'GOOD_CONSTANT' }
+      let(:undesirable_names_config) do
+        super().merge(
+          'OTHER_BAD_CONSTANT' => {
+            'Message' => 'Use GOOD_CONSTANT instead of OTHER_BAD_CONSTANT'
+          }
+        )
       end
 
       it 'registers multiple offenses' do
