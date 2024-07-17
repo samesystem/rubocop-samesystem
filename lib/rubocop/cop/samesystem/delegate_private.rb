@@ -48,7 +48,7 @@ module RuboCop
         end
 
         def mark_scope(node)
-          return if node.receiver || !node.arguments.empty?
+          return if skip_node?(node)
 
           @private_ranges ||= []
 
@@ -58,6 +58,10 @@ module RuboCop
           elsif node.method?(:public)
             cut_from_private_range(scope_range)
           end
+        end
+
+        def skip_node?(node)
+          !node.parent || node.receiver || !node.arguments.empty?
         end
 
         def delegate_node?(node)

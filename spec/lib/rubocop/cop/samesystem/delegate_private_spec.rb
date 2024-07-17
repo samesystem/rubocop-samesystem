@@ -5,6 +5,14 @@ RSpec.describe RuboCop::Cop::Samesystem::DelegatePrivate do
 
   let(:config) { RuboCop::Config.new({}) }
 
+  context 'without class' do
+    it 'registers no offense' do
+      expect_no_offenses(<<~RUBY)
+        puts
+      RUBY
+    end
+  end
+
   context 'when no delegate is provided' do
     it 'registers no offense' do
       expect_no_offenses(<<~RUBY)
