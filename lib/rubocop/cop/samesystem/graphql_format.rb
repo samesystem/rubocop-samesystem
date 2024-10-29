@@ -79,6 +79,8 @@ module RuboCop
         end
 
         def validate_graphql_attributes(block_node)
+          return if block_node.body.nil?
+
           send_nodes = block_node.body.send_type? ? [block_node.body] : block_node.body.children
           attribute_nodes = send_nodes.select { graphql_attribute?(_1) }
           attribute_nodes.each do |attribute_node|
