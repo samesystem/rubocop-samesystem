@@ -16,7 +16,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
   end
 
   context 'when block argument name is correct' do
-    it 'registers an offense' do
+    it 'registers no offense' do
       expect_no_offenses(<<~RUBY)
         class User
           graphql do |c|
@@ -152,11 +152,22 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
   end
 
   context 'when graphql block has attributes with chainable syntax' do
-    it 'registers an offense' do
+    it 'registers no offense' do
       expect_no_offenses(<<~RUBY)
         class User
           graphql do |c|
             c.attribute(:first_name).type('String!')
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'with empty block' do
+    it 'registers no offense' do
+      expect_no_offenses(<<~RUBY)
+        class User
+          graphql do |c|
           end
         end
       RUBY
