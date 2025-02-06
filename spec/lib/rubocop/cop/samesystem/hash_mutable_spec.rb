@@ -36,7 +36,7 @@ RSpec.describe RuboCop::Cop::Samesystem::HashMutable, :config do
       it 'does not register offense' do
         expect_offense(<<~RUBY)
           foo = Hash.new(5 + 4 + bar)
-                ^^^^^^^^^^^^^^^^^^^^^ Ensure that default value of Hash returns immutable or a new object
+                ^^^^^^^^^^^^^^^^^^^^^ Samesystem/HashMutable: Ensure that default value of Hash returns immutable or a new object
         RUBY
       end
     end
@@ -109,7 +109,7 @@ RSpec.describe RuboCop::Cop::Samesystem::HashMutable, :config do
       it 'registers offense when initializing hash' do
         expect_offense(<<~RUBY)
           foo = Hash.new('string')
-                ^^^^^^^^^^^^^^^^^^ Ensure that default value of Hash returns immutable or a new object
+                ^^^^^^^^^^^^^^^^^^ Samesystem/HashMutable: Ensure that default value of Hash returns immutable or a new object
         RUBY
       end
     end
@@ -119,21 +119,21 @@ RSpec.describe RuboCop::Cop::Samesystem::HashMutable, :config do
     it 'registers offense when initializing hash' do
       expect_offense(<<~RUBY)
         foo = Hash.new(bar)
-              ^^^^^^^^^^^^^ Ensure that default value of Hash returns immutable or a new object
+              ^^^^^^^^^^^^^ Samesystem/HashMutable: Ensure that default value of Hash returns immutable or a new object
       RUBY
     end
 
     it 'registers offense when initializing hash' do
       expect_offense(<<~RUBY)
         foo = Hash.new([])
-              ^^^^^^^^^^^^ Ensure that default value of Hash returns immutable or a new object
+              ^^^^^^^^^^^^ Samesystem/HashMutable: Ensure that default value of Hash returns immutable or a new object
       RUBY
     end
 
     it 'registers offense when initializing hash' do
       expect_offense(<<~RUBY)
         foo = Hash.new({})
-              ^^^^^^^^^^^^ Ensure that default value of Hash returns immutable or a new object
+              ^^^^^^^^^^^^ Samesystem/HashMutable: Ensure that default value of Hash returns immutable or a new object
       RUBY
     end
   end

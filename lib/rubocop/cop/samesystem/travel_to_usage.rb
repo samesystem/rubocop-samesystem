@@ -18,7 +18,7 @@ module RuboCop
       #   # good
       #   travel_to(Date.current, &block)
       #
-      class TravelToUsage < Cop
+      class TravelToUsage < ::RuboCop::Cop::Base
         MSG = 'Provide block to avoid time leaks'
 
         def on_send(node)

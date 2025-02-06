@@ -35,7 +35,7 @@ RSpec.describe RuboCop::Cop::Samesystem::TravelToUsage do
       expect_offense(<<~RUBY)
         before do
           travel_to(Date.current)
-          ^^^^^^^^^^^^^^^^^^^^^^^ Provide block to avoid time leaks
+          ^^^^^^^^^^^^^^^^^^^^^^^ Samesystem/TravelToUsage: Provide block to avoid time leaks
         end
       RUBY
     end

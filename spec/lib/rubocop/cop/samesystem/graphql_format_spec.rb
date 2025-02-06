@@ -32,7 +32,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
       expect_offense(<<~RUBY)
         # class User
           graphql do |wrong|
-                      ^^^^^ `graphql` block should have argument named `c`
+                      ^^^^^ Samesystem/GraphqlFormat: `graphql` block should have argument named `c`
             wrong.attribute(:name).type('String')
           end
         # end
@@ -45,7 +45,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
       expect_offense(<<~RUBY)
         class User
           graphql do
-          ^^^^^^^^^^ `graphql` block should have single argument
+          ^^^^^^^^^^ Samesystem/GraphqlFormat: `graphql` block should have single argument
           end
         end
       RUBY
@@ -57,7 +57,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
       expect_offense(<<~RUBY)
         class User
           graphql do |c, d|
-          ^^^^^^^^^^^^^^^^^ `graphql` block should have single argument
+          ^^^^^^^^^^^^^^^^^ Samesystem/GraphqlFormat: `graphql` block should have single argument
           end
         end
       RUBY
@@ -71,7 +71,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
           class User
             graphql do |c|
               c.attribute :id, type: 'String'
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Samesystem/GraphqlFormat: `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
               c.attribute(:name)
             end
           end
@@ -85,7 +85,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
           class User
             graphql do |c|
               c.attribute :first_name, type: 'String!'
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Samesystem/GraphqlFormat: `c.attribute` must be defined using chainable syntax such as `c.attribute(:name).type('String')`
             end
           end
         RUBY
@@ -99,7 +99,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
         class User
           graphql do |c|
             c.attribute(:first_name).type(:String!)
-                                          ^^^^^^^^ `.type` argument must be a string such as `.type('User')`
+                                          ^^^^^^^^ Samesystem/GraphqlFormat: `.type` argument must be a string such as `.type('User')`
           end
         end
       RUBY
@@ -114,7 +114,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
             c.attribute(:friends_count)
              .required
              .type(:Integer)
-                   ^^^^^^^^ `.type` argument must be a string such as `.type('User')`
+                   ^^^^^^^^ Samesystem/GraphqlFormat: `.type` argument must be a string such as `.type('User')`
              .property(:friends_number)
 
           end
@@ -130,13 +130,12 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
           graphql do |c|
             c.attribute(:first_name).type('String')
             c.attribute(:friends_count).type(:Integer)
-                                             ^^^^^^^^ `.type` argument must be a string such as `.type('User')`
+                                             ^^^^^^^^ Samesystem/GraphqlFormat: `.type` argument must be a string such as `.type('User')`
           end
         end
       RUBY
     end
   end
-
 
   context 'when shortcut types are used' do
     it 'registers an offense' do
@@ -144,7 +143,7 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
         class User
           graphql do |c|
             c.attribute(:admin).type('[bool!]!')
-                                     ^^^^^^^^^^ Use "[Boolean!]!" instead
+                                     ^^^^^^^^^^ Samesystem/GraphqlFormat: Use "[Boolean!]!" instead
           end
         end
       RUBY

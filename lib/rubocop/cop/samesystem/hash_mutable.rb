@@ -18,7 +18,7 @@ module RuboCop
       #   # good
       #   Hash.new { |h, k| h[k] = [] }
       #
-      class HashMutable < Cop
+      class HashMutable < ::RuboCop::Cop::Base
         include RuboCop::Cop::FrozenStringLiteral
 
         def_node_matcher :hash_with_default?, <<~PATTERN

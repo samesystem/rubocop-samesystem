@@ -16,7 +16,7 @@ module RuboCop
       #   # good
       #   private
       #   delegate :baz, to: :bar, private: true
-      class DelegatePrivate < Cop
+      class DelegatePrivate < ::RuboCop::Cop::Base
         MSG_MISSING_PRIVATE = '`delegate` in private section should have `private: true` option'
         MSG_WRONG_PRIVATE = 'private `delegate` should be put in private section'
 

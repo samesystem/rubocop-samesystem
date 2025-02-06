@@ -15,7 +15,7 @@ module RuboCop
       #   graphql do |c|
       #     c.attribute(:foo).type('String')
       #   end
-      class GraphqlFormat < Cop
+      class GraphqlFormat < ::RuboCop::Cop::Base
         include ConfigurableFormatting
 
         EXPECTED_ARGUMENT_NAME = :c

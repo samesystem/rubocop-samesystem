@@ -18,11 +18,11 @@ module RuboCop
       #   # good
       #   user_calendar_lines = fetch_calendar_lines(user)
       #
-      class VariableNaming < Cop
+      class VariableNaming < ::RuboCop::Cop::Base
         include ConfigurableFormatting
 
         FORMATS = {
-          it:  /[^it]/,
+          it: /[^it]/
         }.freeze
 
         MSG = 'Please use descriptive variable names.'

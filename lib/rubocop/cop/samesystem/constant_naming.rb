@@ -12,7 +12,7 @@ module RuboCop
       #
       #   # good
       #   GOOD_NAME
-      class ConstantNaming < RuboCop::Cop::Cop
+      class ConstantNaming < ::RuboCop::Cop::Base
         CONST_NODE_REGEXP = /\(const (nil)? :([\w\d_]+)\)/.freeze
 
         def on_const(node)
