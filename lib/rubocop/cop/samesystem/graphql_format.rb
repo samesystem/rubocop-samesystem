@@ -46,8 +46,10 @@ module RuboCop
 
           'string' => 'String',
           'str' => 'String',
-          'text' => 'String',
+          'text' => 'String'
         }
+
+        ALLOWED_NON_CHAINABLE_METHODS = %i[permit_input].freeze
 
         def on_block(block_node)
           return unless graphql_block?(block_node)
@@ -90,6 +92,7 @@ module RuboCop
 
         def validate_graphql_attribute(attribute_node)
           return true if attribute_node.children.count < 4
+          return true if ALLOWED_NON_CHAINABLE_METHODS.include?(attribute_node.method_name)
 
           second_argument = attribute_node.children[3]
           return true unless second_argument.hash_type?
@@ -153,7 +156,7 @@ module RuboCop
 
         def graphql_config_variable(inner_node)
           config_variable = inner_node.receiver
-          config_variable = config_variable.receiver while config_variable && config_variable.send_type?
+          config_variable = config_variable.receiver while config_variable&.send_type?
 
           return nil unless config_variable
           return nil unless config_variable.lvar_type?

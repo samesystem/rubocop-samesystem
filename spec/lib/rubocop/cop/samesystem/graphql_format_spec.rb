@@ -27,6 +27,19 @@ RSpec.describe RuboCop::Cop::Samesystem::GraphqlFormat do
     end
   end
 
+  context 'when block does not contain `.type` method' do
+    it 'registers no offense' do
+      expect_no_offenses(<<~RUBY)
+        class User
+          graphql do |c|
+            c.attribute(:name)
+             .permit_input(:input, type: 'UserInput', subtype: 'User')
+          end
+        end
+      RUBY
+    end
+  end
+
   context 'when wrong graphql block argument is given' do
     it 'registers an offense' do
       expect_offense(<<~RUBY)
